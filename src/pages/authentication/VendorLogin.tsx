@@ -5,10 +5,8 @@ import { Eye, EyeOff } from "lucide-react";
 import { validateCameroonPhone, validatePassword } from "../../utils/validators";
 import { InputAuth } from "../../assets/components/UI/Input";
 import { ButtonAuth } from "../../assets/components/UI/Button";
-import { useAuth } from "../../context/AuthContext";
 
-
-const ReviewerLogin: React.FC = () => {
+const VendorLogin: React.FC = () => {
   const navigate = useNavigate();
 
   const [phoneNumber, setPhoneNumber] = useState<string>("");
@@ -16,21 +14,19 @@ const ReviewerLogin: React.FC = () => {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
-
-    
+   
 
     if (!validateCameroonPhone(phoneNumber)) {
-      setError("Invalid number. Please enter a 9-digit Cameronian number.");
+      setError("Invalid Cameroonian phone number.");
       return;
     }
 
     if (!validatePassword(password)) {
-      setError("Please enter your password.");
+      setError("Password must be at least 6 characters.");
       return;
     }
 
@@ -40,21 +36,14 @@ const ReviewerLogin: React.FC = () => {
       // Simulate API request
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      console.log("Reviewer logged in", phoneNumber, password);
+      console.log("Vendor logged in", phoneNumber, password);
 
-      navigate("/dashboard");
+      navigate(`/vendor/${phoneNumber}`);
     } catch (err) {
       setError("Login failed. Please try again.");
     } finally {
       setLoading(false);
     }
-
-    login({
-      id: phoneNumber,
-      name: "Precious", 
-    });
-
-      navigate("/dashboard");
   };
 
   return (
@@ -66,7 +55,7 @@ const ReviewerLogin: React.FC = () => {
         className="w-full max-w-sm bg-white shadow-xl rounded-2xl p-8"
       >
         <h2 className="text-2xl font-bold text-green-900 mb-2 text-center">
-          Reviewer Login
+          Vendor Login
         </h2>
 
         <p className="text-gray-600 text-sm text-center mb-6">
@@ -89,6 +78,7 @@ const ReviewerLogin: React.FC = () => {
             placeholder="Phone Number"
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
+            
           />
 
           {/* Password Field with Toggle */}
@@ -98,14 +88,14 @@ const ReviewerLogin: React.FC = () => {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              
+             
             />
 
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-3 text-gray-500 hover:text-green-800"
-            >
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500  hover:text-green-800"
+              >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
@@ -126,12 +116,13 @@ const ReviewerLogin: React.FC = () => {
           >
           {loading ? "Logging in..." : "Login"}
           </ButtonAuth>
+          
         </form>
 
         <p className="text-sm text-center mt-6">
           Don’t have an account?{" "}
           <span
-            onClick={() => navigate("/reviewer/signup")}
+            onClick={() => navigate("/vendor/signup")}
             className="text-green-800 font-semibold cursor-pointer hover:underline"
           >
             Sign Up
@@ -142,4 +133,4 @@ const ReviewerLogin: React.FC = () => {
   );
 };
 
-export default ReviewerLogin;
+export default VendorLogin;

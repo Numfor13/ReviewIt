@@ -1,32 +1,42 @@
+// src/pages/VendorSignUp.tsx
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { InputAuth } from "../../assets/components/UI/Input";
 import { ButtonAuth } from "../../assets/components/UI/Button";
+import ErrorState from "../../assets/components/UI/ErrorState";
 import { validateCameroonPhone, validatePassword } from "../../utils/validators";
+import { vendorSignup } from "../../services/vendorService";
 
-const ReviewerSignUp: React.FC = () => {
+const VendorSignUp: React.FC = () => {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
-    name:"",
+    businessName: "",
+    category: "",
     phoneNumber: "",
     password: "",
     confirmPassword: "",
   });
 
-  const [error, setError] = useState<string>("");
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!form.name||!form.phoneNumber || !form.password || !form.confirmPassword) {
+    if (
+      !form.businessName ||
+      !form.category ||
+      !form.phoneNumber ||
+      !form.password ||
+      !form.confirmPassword
+    ) {
       setError("All fields are required.");
       return;
     }
-  
-    
-   if (!validateCameroonPhone(form.phoneNumber)) {
+
+    if (!validateCameroonPhone(form.phoneNumber)) {
       setError("Invalid Cameroonian phone number.");
       return;
     }
@@ -43,10 +53,14 @@ const ReviewerSignUp: React.FC = () => {
 
     setError("");
 
-    console.log("Reviewer signup", form);
+    await vendorSignup({
+      businessName: form.businessName,
+      category: form.category,
+      phoneNumber: form.phoneNumber,
+      password: form.password,
+    });
 
-    // After successful signup
-    navigate("/reviewer/login");
+    navigate("/vendor/login");
   };
 
   return (
@@ -58,26 +72,31 @@ const ReviewerSignUp: React.FC = () => {
         className="w-full max-w-sm bg-white shadow-xl rounded-2xl p-8"
       >
         <h2 className="text-2xl font-bold text-green-900 mb-2 text-center">
-          Reviewer Sign Up
+          Vendor Sign Up
         </h2>
 
         <p className="text-gray-600 text-sm text-center mb-6">
-          Join the community and start reviewing.
+          Grow smarter with real feedback
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-
           <InputAuth
-            type="text"
-            placeholder="Name"
-            value={form.name}
+            placeholder="Business Name"
+            value={form.businessName}
             onChange={(e) =>
-              setForm({ ...form, name: e.target.value })
+              setForm({ ...form, businessName: e.target.value })
             }
           />
 
           <InputAuth
-            type="text"
+            placeholder="Business Category"
+            value={form.category}
+            onChange={(e) =>
+              setForm({ ...form, category: e.target.value })
+            }
+          />
+
+          <InputAuth
             placeholder="Phone Number"
             value={form.phoneNumber}
             onChange={(e) =>
@@ -103,15 +122,7 @@ const ReviewerSignUp: React.FC = () => {
             }
           />
 
-          {error && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-red-500 text-sm"
-            >
-              {error}
-            </motion.p>
-          )}
+          {error && <ErrorState message={error} />}
 
           <ButtonAuth type="submit">
             Sign Up
@@ -121,7 +132,7 @@ const ReviewerSignUp: React.FC = () => {
         <p className="text-sm text-center mt-6">
           Already have an account?{" "}
           <span
-            onClick={() => navigate("/reviewer/login")}
+            onClick={() => navigate("/vendor/login")}
             className="text-green-800 font-semibold cursor-pointer hover:underline"
           >
             Login
@@ -132,4 +143,4 @@ const ReviewerSignUp: React.FC = () => {
   );
 };
 
-export default ReviewerSignUp;
+export default VendorSignUp;

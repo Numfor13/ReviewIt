@@ -13,3 +13,10 @@ export interface Vendor {
   averageRating: number;
   reviews: Review[];
 }
+
+export interface VendorSignupDTO {
+  businessName: string;
+  category: string;
+  phoneNumber: string;
+  password: string;
+}

@@ -98,7 +98,7 @@ const Home: React.FC = () => {
             <motion.div
               whileHover={{ scale: 1.08 }}
               key={cat.name}
-              className="min-w-[110px] md:min-w-[140px] text-center cursor-pointer snap-start"
+              className="min-width:100px md:min-width:140px text-center cursor-pointer snap-start"
             >
               <img
                 src={cat.img}

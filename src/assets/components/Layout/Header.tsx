@@ -1,5 +1,5 @@
 
-import { Search, Bell, MoreVertical, User } from "lucide-react";
+import { MoreVertical, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import {motion} from "framer-motion"

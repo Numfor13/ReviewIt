@@ -23,7 +23,8 @@ const categories = [
     {name: "Hair Suppies", img: "src/assets/images/hair supplies.jpg"},
     {name: "Services", img: "src/assets/images/services.jpg"},
     {name: "Travel", img: "src/assets/images/travel.jpg"},
-    {name: "Arts and Entertainment", img: "src/assets/images/Arts-Entertainment-2.jpg"},{name: "Others", img: "src/assets/images/others.png"},
+    {name: "Arts and Entertainment", img: "src/assets/images/Arts-Entertainment-2.jpg"},
+    {name: "Others", img: "src/assets/images/others.png"},
   ];
 
   const popular = [

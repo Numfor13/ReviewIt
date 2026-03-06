@@ -7,46 +7,13 @@ import { ButtonHome } from "../assets/components/UI/Button";
 import { validateCameroonPhone } from "../utils/validators";
 import { Search, Star } from "lucide-react";
 import { motion } from "framer-motion";
+import { Categories } from "../utils/categories";
 
-import cosmetics from "../assets/images/cosmetics.jpg";
-import accessories from "../assets/images/accessories.jpg";
-import education from "../assets/images/education.webp";
-import finance from "../assets/images/finance.jpg";
-import food from "../assets/images/food.jpg";
-import hair from "../assets/images/hair.jpg";
-import services from "../assets/images/services.jpg";
-import travel from "../assets/images/travel.jpg";
-import Arts from "../assets/images/Arts.jpg";
-import others from "../assets/images/others.png";
-import electronics from "../assets/images/electronics.jpg"
-import Clothes from "../assets/images/Clothes.jpg"
-import shoes from "../assets/images/shoes.jpeg"
-import skin_care from "../assets/images/skin_care.jpg"
-import health from "../assets/images/health.png"
-
-// Placeholder data
-const categories = [
-    {name: "Electronics", img: electronics},
-    { name: "Fashion" , img: Clothes },
-    {name: "Shoes", img: shoes},
-    {name: "Skin Care", img: skin_care},
-    {name: "Health and Wellness", img: health},
-    {name: "Cosmetics", img: cosmetics},
-    {name: "Accessories", img: accessories},
-    {name: "Education", img: education},
-    {name: "Finance", img: finance},
-    {name: "Food and Beverages", img: food},
-    {name: "Hair Suppies", img: hair},
-    {name: "Services", img: services},
-    {name: "Travel", img: travel},
-    {name: "Arts and Entertainment", img: Arts},
-    {name: "Others", img: others},
-  ];
 
   const popular = [
-    {name: "Clau's wigs", rating: 4.6},
-    {name: "Blink's electronics", rating: 4.3},
-    {name: "Hope's Cosmetics", rating: 4.8},
+    {name: "Clau's wigs", rating: 4.6, phoneNumber: "677123456"},
+    {name: "Blink's electronics", rating: 4.3, phoneNumber: "678987654"},
+    {name: "Hope's Cosmetics", rating: 4.8, phoneNumber: "679555444"},
   ];
 
 
@@ -87,7 +54,7 @@ const Home: React.FC = () => {
         >
           <InputHome
             type="text"
-            placeholder="Search business/phone number"
+            placeholder="Search business phone number"
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
           />
@@ -111,16 +78,17 @@ const Home: React.FC = () => {
         </h3>
 
         <div className="flex overflow-x-auto space-x-4 md:space-x-6 pb-4 snap-x snap-mandatory">
-          {categories.map((cat) => (
+          {Categories.map((cat) => (
             <motion.div
               whileHover={{ scale: 1.08 }}
               key={cat.name}
-              className="min-width:100px md:min-width:140px text-center cursor-pointer snap-start"
+              onClick={()=>navigate(`/dashboard?category=${encodeURIComponent(cat.name)}`)}
+              className="min-width:110px md:min-width:140px text-center cursor-pointer snap-start flex flex-col items-center"
             >
               <img
                 src={cat.img}
                 alt={cat.name}
-                className="h-20 w-20 md:h-24 md:w-24 object-cover rounded-full mx-auto shadow-md"
+                className="h-20 w-20 md:h-24 md:w-24 object-cover rounded-full mx-auto shadow-md aspect-square"
               />
               <p className="mt-2">{cat.name}</p>
             </motion.div>
@@ -139,6 +107,7 @@ const Home: React.FC = () => {
             <motion.div
               whileHover={{ scale: 1.05 }}
               key={biz.name}
+              onClick={()=>navigate(`/vendor/${biz.phoneNumber}`)}
               className="p-3 md:p-4 shadow-md rounded-xl flex justify-between items-center"
             >
               <p>{biz.name}</p>

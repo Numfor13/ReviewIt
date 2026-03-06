@@ -9,35 +9,66 @@ import { Search, Star } from "lucide-react";
 import { motion } from "framer-motion";
 import { Categories } from "../utils/categories";
 
-
-  const popular = [
-    {name: "Clau's wigs", rating: 4.6, phoneNumber: "677123456"},
-    {name: "Blink's electronics", rating: 4.3, phoneNumber: "678987654"},
-    {name: "Hope's Cosmetics", rating: 4.8, phoneNumber: "679555444"},
-  ];
-
+const popular = [
+  { name: "Clau's Wigs", rating: 4.6, phoneNumber: "677123456" },
+  { name: "Blink's Electronics", rating: 4.3, phoneNumber: "678987654" },
+  { name: "Hope's Cosmetics", rating: 4.8, phoneNumber: "679555444" },
+];
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [searchValue, setSearchValue] = useState("");
   const [error, setError] = useState("");
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!validateCameroonPhone(phoneNumber)) {
+  const query = searchValue.trim();
+
+  // Detect if user typed only numbers
+  const isNumber = /^\d+$/.test(query);
+
+  if (isNumber) {
+    // Validate Cameroon phone number
+    if (!validateCameroonPhone(query)) {
       setError("Please enter a valid 9-digit Cameroon phone number.");
       return;
     }
 
+    // Check if number exists
+    const foundBusiness = popular.find(
+      (biz) => biz.phoneNumber === query
+    );
+
+    if (!foundBusiness) {
+      setError("Number does not exist.");
+      return;
+    }
+
     setError("");
-    navigate(`/vendor/${phoneNumber}`);
-  };
+    navigate(`/vendor/${query}`);
+    return;
+  }
+
+  // Otherwise treat as name search
+  const foundBusiness = popular.find((biz) =>
+    biz.name.toLowerCase().includes(query.toLowerCase())
+  );
+
+  if (!foundBusiness) {
+    setError("Business name does not exist.");
+    return;
+  }
+
+  setError("");
+  navigate(`/vendor/${foundBusiness.phoneNumber}`);
+};
 
   return (
-   <div className="min-h-screen bg-linear-to-br from-green-100 via-white to-green-200 overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-green-100 via-white to-green-200 ">
       <Header />
-
+      
+    <main  className="overflow-x-hidden">
       {/* HERO */}
       <section className="text-center py-12 md:py-16 px-4 md:px-6">
         <h2 className="text-2xl md:text-4xl font-bold text-green-900">
@@ -54,9 +85,9 @@ const Home: React.FC = () => {
         >
           <InputHome
             type="text"
-            placeholder="Search business phone number"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
+            placeholder="Search business name / phone number"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
           />
           <ButtonHome
             type="submit"
@@ -66,9 +97,7 @@ const Home: React.FC = () => {
           </ButtonHome>
         </form>
 
-        {error && (
-          <p className="text-red-500 text-sm mt-3">{error}</p>
-        )}
+        {error && <p className="text-red-500 text-sm mt-3">{error}</p>}
       </section>
 
       {/* CATEGORIES */}
@@ -82,15 +111,17 @@ const Home: React.FC = () => {
             <motion.div
               whileHover={{ scale: 1.08 }}
               key={cat.name}
-              onClick={()=>navigate(`/dashboard?category=${encodeURIComponent(cat.name)}`)}
-              className="min-width:110px md:min-width:140px text-center cursor-pointer snap-start flex flex-col items-center"
+              onClick={() =>
+                navigate(`/dashboard?category=${encodeURIComponent(cat.name)}`)
+              }
+              className="min-w-[110px] md:min-w-[140px] text-center cursor-pointer snap-start flex flex-col items-center"
             >
               <img
                 src={cat.img}
                 alt={cat.name}
-                className="h-20 w-20 md:h-24 md:w-24 object-cover rounded-full mx-auto shadow-md aspect-square"
+                className="h-24 w-24 md:h-28 md:w-28 object-cover rounded-full shadow-md"
               />
-              <p className="mt-2">{cat.name}</p>
+              <p className="mt-2 text-sm md:text-base">{cat.name}</p>
             </motion.div>
           ))}
         </div>
@@ -107,8 +138,8 @@ const Home: React.FC = () => {
             <motion.div
               whileHover={{ scale: 1.05 }}
               key={biz.name}
-              onClick={()=>navigate(`/vendor/${biz.phoneNumber}`)}
-              className="p-3 md:p-4 shadow-md rounded-xl flex justify-between items-center"
+              onClick={() => navigate(`/vendor/${biz.phoneNumber}`)}
+              className="p-3 md:p-4 shadow-md rounded-xl flex justify-between items-center cursor-pointer"
             >
               <p>{biz.name}</p>
               <p className="flex items-center">
@@ -149,6 +180,7 @@ const Home: React.FC = () => {
       </section>
 
       <Footer />
+      </main>
     </div>
   );
 };

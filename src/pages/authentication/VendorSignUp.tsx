@@ -1,5 +1,5 @@
 // src/pages/VendorSignUp.tsx
-
+import type React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -8,6 +8,7 @@ import { ButtonAuth } from "../../assets/components/UI/Button";
 import ErrorState from "../../assets/components/UI/ErrorState";
 import { validateCameroonPhone, validatePassword } from "../../utils/validators";
 import { vendorSignup } from "../../services/vendorService";
+import { categoriesLabel } from "../../utils/categories";
 
 const VendorSignUp: React.FC = () => {
   const navigate = useNavigate();
@@ -53,14 +54,20 @@ const VendorSignUp: React.FC = () => {
 
     setError("");
 
-    await vendorSignup({
-      businessName: form.businessName,
-      category: form.category,
-      phoneNumber: form.phoneNumber,
-      password: form.password,
-    });
+    try {
+      await vendorSignup({
+        businessName: form.businessName,
+        category: form.category,
+        phoneNumber: form.phoneNumber,
+        password: form.password,
+      });
 
-    navigate("/vendor/login");
+      navigate("/vendor/login");
+
+    } catch (err: any) {
+      setError(err.message || "Signup failed");
+    }
+
   };
 
   return (
@@ -88,13 +95,22 @@ const VendorSignUp: React.FC = () => {
             }
           />
 
-          <InputAuth
-            placeholder="Business Category"
-            value={form.category}
-            onChange={(e) =>
-              setForm({ ...form, category: e.target.value })
-            }
-          />
+          {/* Category Dropdown */}
+          <div>
+          
+            <select
+              value={form.category}
+              onChange={(e) => setForm({ ...form, category: e.target.value })}
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-800"
+            >
+              <option value="">Select Category</option>
+              {categoriesLabel.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+          </div>
 
           <InputAuth
             placeholder="Phone Number"

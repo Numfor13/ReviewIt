@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../assets/components/Layout/Header";
 import Footer from "../assets/components/Layout/Footer";
@@ -9,18 +9,67 @@ import { Search, Star } from "lucide-react";
 import { motion } from "framer-motion";
 import { Categories } from "../utils/categories";
 
-const popular = [
-  { name: "Clau's Wigs", rating: 4.6, phoneNumber: "677123456" },
-  { name: "Blink's Electronics", rating: 4.3, phoneNumber: "678987654" },
-  { name: "Hope's Cosmetics", rating: 4.8, phoneNumber: "679555444" },
-];
+import { supabase } from "../lib/supabaseClient";
+
+
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState("");
   const [error, setError] = useState("");
+  const [popular, setPopular] = useState<any[]>([]);
 
-  const handleSearch = (e: React.FormEvent) => {
+  useEffect(() => {
+    const fetchPopular = async () => {
+      const { data, error } = await supabase
+        .from("vendors")
+        .select(`
+          id,
+          business_name,
+          phone_number,
+          category,
+          description,
+          profile_picture,
+          reviews (
+            rating
+          )
+        `)
+        .limit(5);
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      const formatted = data.map((v: any) => {
+        const reviewCount = v.reviews?.length || 0;
+
+        let avgRating = 0;
+        if (reviewCount > 0) {
+          const total = v.reviews.reduce(
+            (sum: number, r: any) => sum + r.rating,
+            0
+          );
+          avgRating = Number((total / reviewCount).toFixed(1));
+        }
+
+        return {
+          name: v.business_name,
+          rating: avgRating,
+          reviewCount: reviewCount,
+          phoneNumber: v.phone_number,
+          description: v.description,
+          image: v.profile_picture,
+        };
+      });
+
+      setPopular(formatted);
+    };
+
+    fetchPopular();
+  }, []);
+
+  const handleSearch = async (e: React.FormEvent) => {
   e.preventDefault();
 
   const query = searchValue.trim();
@@ -36,11 +85,19 @@ const Home: React.FC = () => {
     }
 
     // Check if number exists
-    const foundBusiness = popular.find(
-      (biz) => biz.phoneNumber === query
-    );
+    if (isNumber) {
+    if (!validateCameroonPhone(query)) {
+      setError("Please enter a valid 9-digit Cameroon phone number.");
+      return;
+    }
 
-    if (!foundBusiness) {
+    const { data } = await supabase
+      .from("vendors")
+      .select("phone_number")
+      .eq("phone_number", query)
+      .single();
+
+    if (!data) {
       setError("Number does not exist.");
       return;
     }
@@ -48,6 +105,7 @@ const Home: React.FC = () => {
     setError("");
     navigate(`/vendor/${query}`);
     return;
+  }
   }
 
   // Otherwise treat as name search
@@ -68,7 +126,7 @@ const Home: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-green-100 via-white to-green-200 ">
       <Header />
       
-    <main  className="overflow-x-hidden">
+    <main className="overflow-x-hidden px-4 md:px-6 lg:px-8 max-w-7xl mx-auto">
       {/* HERO */}
       <section className="text-center py-12 md:py-16 px-4 md:px-6">
         <h2 className="text-2xl md:text-4xl font-bold text-green-900">
@@ -128,40 +186,63 @@ const Home: React.FC = () => {
       </section>
 
       {/* POPULAR */}
-      <section className="px-4 md:px-6 py-8 md:py-10 bg-white">
-        <h3 className="text-xl font-semibold mb-6 text-green-900">
-          Popular Searches
-        </h3>
+      <section className="py-10">
+  <h3 className="text-xl font-semibold mb-6 text-green-900">
+    Popular Searches
+  </h3>
 
-        <div className="space-y-4">
-          {popular.map((biz) => (
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              key={biz.name}
-              onClick={() => navigate(`/vendor/${biz.phoneNumber}`)}
-              className="p-3 md:p-4 shadow-md rounded-xl flex justify-between items-center cursor-pointer"
-            >
-              <p>{biz.name}</p>
-              <p className="flex items-center">
-                <Star size={14} className="text-yellow-500 mr-1" />
-                {biz.rating}
-              </p>
-            </motion.div>
-          ))}
-        </div>
+  <div className="flex overflow-x-auto space-x-6 pb-4 snap-x snap-mandatory">
+    {popular.map((biz) => (
+      <motion.div
+        whileHover={{ scale: 1.05 }}
+        key={biz.name}
+        onClick={() => navigate(`/vendor/${biz.phoneNumber}`)}
+        className="min-w-[260px] bg-white rounded-xl shadow-md cursor-pointer snap-start overflow-hidden"
+      >
+        
+          {biz.image ? (
+            <img
+              src={biz.image}
+              alt={biz.name}
+              className="w-24 h-24 rounded-full object-cover shadow-xl ring-4 ring-white"
+            />
+          ) : (
+            <div className="w-24 h-24 rounded-full bg-green-600 flex items-center justify-center text-white text-3xl font-bold shadow-xl ring-4 ring-white">
+              {biz.name.charAt(0)}
+            </div>
+          )}
+        
 
-        <div className="text-center mt-6">
-          <button
-            onClick={() => navigate("/dashboard")}
-            className="text-green-800 font-semibold hover:underline"
-          >
-            See More →
-          </button>
+        <div className="p-4">
+          <div className="flex justify-between items-center">
+            <h4 className="font-semibold text-green-900">{biz.name}</h4>
+
+            <span className="flex items-center text-sm">
+              <Star size={14} className="text-yellow-500 mr-1" />
+              {biz.rating} ({biz.reviewCount})
+            </span>
+          </div>
+
+          <p className="text-sm text-gray-500 mt-1">
+            {biz.description}
+          </p>
         </div>
-      </section>
+      </motion.div>
+    ))}
+  </div>
+
+  <div className="text-center mt-4">
+    <button
+      onClick={() => navigate("/dashboard")}
+      className="bg-green-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-green-900 transition"
+    >
+      See More →
+    </button>
+  </div>
+</section>
 
       {/* CTA */}
-      <section className="border-t border-b py-12 md:py-16 px-4 text-center bg-green-50">
+      <section className="border-t border-b py-10 md:py-16 px-4 text-center bg-green-50">
         <h3 className="text-xl md:text-2xl font-bold text-green-900">
           Do you own a business?
         </h3>
@@ -178,9 +259,9 @@ const Home: React.FC = () => {
           Get Started
         </motion.button>
       </section>
-
-      <Footer />
-      </main>
+     </main>
+    <Footer />
+     
     </div>
   );
 };

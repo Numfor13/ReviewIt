@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState , useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import Header from "../assets/components/Layout/Header";
@@ -6,6 +6,8 @@ import { Search, Star } from "lucide-react";
 import { validateCameroonPhone } from "../utils/validators";
 import { InputHome } from "../assets/components/UI/Input";
 import { ButtonHome } from "../assets/components/UI/Button";
+import { supabase } from "../lib/supabaseClient";
+
 
 const categories = [
   "Electronics",
@@ -25,18 +27,65 @@ const categories = [
   "Others",
 ];
 
-const businesses = [
-  { id: "1", name: "Clau's Wigs", category: "Fashion", rating: 4.6, phoneNumber: "677123456" },
-  { id: "2", name: "Blink's Electronics", category: "Electronics", rating: 4.3, phoneNumber: "671234567" },
-  { id: "3", name: "Hope's Cosmetics", category: "Cosmetics", rating: 4.8, phoneNumber: "699123456" },
-  { id: "4", name: "Elite Tutors", category: "Education", rating: 4.5, phoneNumber: "680123456" },
-  { id: "5", name: "Random Business", category: "Unknown", rating: 3.9, phoneNumber: "655123456" },
-  { id: "6", name: "Dynasty Clothing", category: "Fashion", rating: 4.8, phoneNumber: "677123406" },
-];
+
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  const [businesses, setBusinesses] = useState<any[]>([]);
+  const [searchValue, setSearchValue] = useState("");
+  const [error, setError] = useState("");
+  
+    useEffect(() => {
+      const fetchBusinesses = async () => {
+        const { data , error} = await supabase
+          .from("vendors")
+          .select(`
+            id,
+            business_name,
+            phone_number,
+            category,
+            description,
+            profile_picture,
+            reviews (
+              rating
+            )
+          `);
+
+        if (error) {
+          console.error(error);
+          return;
+        }
+
+      const vendors = data.map((v: any) => {
+        const reviewCount = v.reviews?.length || 0;
+
+        let avgRating = 0;
+        if (reviewCount > 0) {
+          const total = v.reviews.reduce(
+            (sum: number, r: any) => sum + r.rating,
+            0
+          );
+          avgRating = Number((total / reviewCount).toFixed(1));
+        }
+
+        return {
+          id: v.id,
+          name: v.business_name,
+          phoneNumber: v.phone_number,
+          category: v.category, 
+          description: v.description,
+          rating: avgRating,
+          reviewCount: reviewCount,
+        };
+      });
+
+    setBusinesses(vendors);
+  };
+
+  fetchBusinesses();
+}, []);
 
   // Scroll to category
   const scrollToCategory = (category: string) => {
@@ -56,9 +105,6 @@ const Dashboard: React.FC = () => {
   }, {} as Record<string, typeof businesses>);
 
   grouped["Others"] = businesses.filter((b) => !categories.includes(b.category));
-
-  const [searchValue, setSearchValue] = useState("");
-  const [error, setError] = useState("");
 
   const handleSearch = (e: React.FormEvent) => {
   e.preventDefault();
@@ -100,6 +146,8 @@ const Dashboard: React.FC = () => {
     return;
   }
 
+  
+
   setError("");
   navigate(`/vendor/${foundBusiness.phoneNumber}`);
 };
@@ -108,9 +156,9 @@ const Dashboard: React.FC = () => {
     <div className="min-h-screen bg-green-50">
       <Header /> {/* Sticky header */}
 
-      <main >
+      <main className="px-4 md:px-6 lg:px-8 max-w-7xl mx-auto">
         {/* Category Navigation - Sticky below header */}
-        <div className="sticky top-16 md:top-[80px] bg-white shadow-md z-20 py-3 px-4 md:px-6 flex overflow-x-auto space-x-3 scrollbar-hide snap-x snap-mandatory">
+        <div className="sticky top-16 md:top-[80px] bg-white shadow-md z-20 py-3 px-4 md:px-6 flex overflow-x-auto space-x-3 scrollbar-hide snap-x snap-mandatory rounded-xl mt-4">
           
 
           {categories.map((cat) => (
@@ -126,9 +174,9 @@ const Dashboard: React.FC = () => {
           ))}
         </div>
 
-        <form
+       <form
           onSubmit={handleSearch}
-          className="mt-6 md:mt-8 w-full max-w-xl mx-auto flex shadow-md rounded-xl overflow-hidden bg-white"
+          className="mt-8 mb-6 w-full max-w-xl mx-auto flex shadow-md rounded-xl overflow-hidden bg-white"
         >
           <InputHome
             type="text"
@@ -151,7 +199,7 @@ const Dashboard: React.FC = () => {
 
 
         {/* Category Sections */}
-        <div className="px-4 md:px-6 py-10 space-y-16 max-w-7xl mx-auto">
+        <div className="px-4 md:px-6 py-12 space-y-20 max-w-7xl mx-auto">
           
           {categories.map((cat) => (
             <div
@@ -183,14 +231,14 @@ const Dashboard: React.FC = () => {
                           <h3 className="font-semibold text-lg text-green-900">{biz.name}</h3>
                           <p className="text-sm text-gray-500 mt-1">{biz.category}</p >
 
-                          <p className="text-sm text-gray-400 mt-0.5">{biz.phoneNumber}
+                          <p className="text-sm text-gray-400 mt-0.5">{biz.description}
 
                           </p>
                         </div>
 
                         <div className="flex items-center bg-yellow-50 px-2 py-1 rounded-lg">
                           <Star size={14} className="text-yellow-400 mr-1" />
-                          <span className="text-sm font-medium">{biz.rating}</span>
+                          <span className="text-sm font-medium">{biz.rating} ({biz.reviewCount})</span>
                         </div>
                       </div>
                     </motion.div>

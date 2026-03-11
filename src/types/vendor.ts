@@ -1,16 +1,11 @@
-export interface Review {
-  id: string;
-  rating: number;
-  comment: string;
-  createdAt: string;
-}
-
+import type { Review } from "./review";
 export interface Vendor {
   id: string;
   name: string;
   phoneNumber: string;
   category: string;
   averageRating: number;
+  profileImage?: string;
   reviews: Review[];
 }
 

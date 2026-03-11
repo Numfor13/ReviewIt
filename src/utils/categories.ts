@@ -32,3 +32,21 @@ export const Categories = [
     {name: "Arts and Entertainment", img: Arts},
     {name: "Others", img: others},
   ];
+
+  export const categoriesLabel = [
+  "Electronics",
+  "Fashion",
+  "Shoes",
+  "Skin Care",
+  "Health and Wellness",
+  "Cosmetics",
+  "Accessories",
+  "Education",
+  "Finance",
+  "Food and Beverages",
+  "Hair Supplies",
+  "Services",
+  "Travel",
+  "Arts and Entertainment",
+  "Others",
+];

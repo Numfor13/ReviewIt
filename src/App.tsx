@@ -7,15 +7,17 @@ import ReviewerSignUp from "./pages/authentication/ReviewerSignUp";
 import VendorSignUp from "./pages/authentication/VendorSignUp";
 import VendorLogin from "./pages/authentication/VendorLogin";
 import Dashboard from "./pages/Dashboard";
+import About from "./pages/About";
 
-import { ChatProvider } from "./context/ChatContext";
-import SideChat from "./pages/SideChat";
+
+// import { ChatProvider } from "./context/ChatContext";
+// import SideChat from "./pages/SideChat";
 import { AuthProvider } from "./context/AuthContext";
 
 const App: React.FC = () => {
   return (
     <AuthProvider>
-      <ChatProvider>
+      {/* <ChatProvider> */}
       <Router>
         <Routes>
           {/* Home Page */}
@@ -35,17 +37,20 @@ const App: React.FC = () => {
             path="/vendor/login" element= {<VendorLogin/>} 
           />
           {/* Global Chat Page */}
-          <Route path="/chat" element={
+          {/* <Route path="/chat" element={
             <ChatProvider>
               {<SideChat />} 
             </ChatProvider>
           }
-         />
+         /> */}
          <Route path="/dashboard" element={<Dashboard/>}/>
+         <Route path="/about" element={<About/>}/>
+
+         <Route path="*" element={<Home />} />
 
         </Routes>
       </Router>
-      </ChatProvider>
+      {/* </ChatProvider> */}
     </AuthProvider>
    
   );

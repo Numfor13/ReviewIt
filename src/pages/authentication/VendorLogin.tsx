@@ -5,6 +5,8 @@ import { Eye, EyeOff } from "lucide-react";
 import { validateCameroonPhone, validatePassword } from "../../utils/validators";
 import { InputAuth } from "../../assets/components/UI/Input";
 import { ButtonAuth } from "../../assets/components/UI/Button";
+import { supabase } from "../../lib/supabaseClient";
+
 
 const VendorLogin: React.FC = () => {
   const navigate = useNavigate();
@@ -33,10 +35,17 @@ const VendorLogin: React.FC = () => {
     try {
       setLoading(true);
 
-      // Simulate API request
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const email = `${phoneNumber}@vendor.reviewit`;
 
-      console.log("Vendor logged in", phoneNumber, password);
+      const { error: loginError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (loginError) {
+        setError("Invalid phone number or password.");
+        return;
+      }
 
       navigate(`/vendor/${phoneNumber}`);
     } catch (err) {

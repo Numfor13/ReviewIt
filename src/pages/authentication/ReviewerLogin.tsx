@@ -6,6 +6,8 @@ import { validateCameroonPhone, validatePassword } from "../../utils/validators"
 import { InputAuth } from "../../assets/components/UI/Input";
 import { ButtonAuth } from "../../assets/components/UI/Button";
 import { useAuth } from "../../context/AuthContext";
+import { useLocation } from "react-router-dom";
+import { supabase } from "../../lib/supabaseClient";
 
 
 const ReviewerLogin: React.FC = () => {
@@ -16,13 +18,17 @@ const ReviewerLogin: React.FC = () => {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const { login } = useAuth();
+  
+
+  
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
 
-    
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { login } = useAuth();
 
     if (!validateCameroonPhone(phoneNumber)) {
       setError("Invalid number. Please enter a 9-digit Cameronian number.");
@@ -37,24 +43,42 @@ const ReviewerLogin: React.FC = () => {
     try {
       setLoading(true);
 
-      // Simulate API request
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+     const email = `${phoneNumber}@reviewer.reviewit`;
 
-      console.log("Reviewer logged in", phoneNumber, password);
+      const { error: loginError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-      navigate("/dashboard");
+      if (loginError) {
+        setError("Invalid phone number or password.");
+        return;
+      }
+
+      const { data: userData } = await supabase
+        .from("users")
+        .select("*")
+        .eq("phone_number", phoneNumber)
+        .single();
+
+      login({
+    
+      id: userData.id,
+      name: userData.name,
+    },
+    "reviewer"
+  
+  );
+
+      const redirectTo = location.state?.from ;
+
+      navigate(redirectTo);
     } catch (err) {
       setError("Login failed. Please try again.");
     } finally {
       setLoading(false);
     }
 
-    login({
-      id: phoneNumber,
-      name: "Precious", 
-    });
-
-      navigate("/dashboard");
   };
 
   return (

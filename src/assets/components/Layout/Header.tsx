@@ -29,10 +29,10 @@ const Header = () => {
 
     {/* Open Chat - ALWAYS visible */}
     <button
-      onClick={() => navigate("/chat")}
-      className="bg-green-700 text-white text-xs md:text-sm px-2 md:px-3 py-1.5 rounded-lg hover:bg-green-900 transition"
+      onClick={() => navigate("/vendor/signup")}
+      className="bg-green-800 text-white text-xs md:text-sm px-2 md:px-3 py-1.5 rounded-lg hover:bg-green-900 transition"
     >
-      Open Chat
+      Create Business
     </button>
 
     {/* User or Sign Up - ALWAYS visible */}
@@ -90,10 +90,10 @@ const Header = () => {
       {showMenu1 && (
         <div className="absolute right-0 mt-2 w-44 bg-white shadow-lg rounded-lg p-2">
           <button
-            onClick={() => navigate("/vendor/signup")}
+            onClick={() => navigate("/about")}
             className="block w-full text-left px-3 py-2 hover:bg-gray-100 rounded"
           >
-            Create Business
+             About
           </button>
         </div>
       )}

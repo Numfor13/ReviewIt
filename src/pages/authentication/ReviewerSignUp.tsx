@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import { InputAuth } from "../../assets/components/UI/Input";
 import { ButtonAuth } from "../../assets/components/UI/Button";
 import { validateCameroonPhone, validatePassword } from "../../utils/validators";
+import { supabase } from "../../lib/supabaseClient";
+
 
 const ReviewerSignUp: React.FC = () => {
   const navigate = useNavigate();
@@ -17,7 +19,7 @@ const ReviewerSignUp: React.FC = () => {
 
   const [error, setError] = useState<string>("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!form.name||!form.phoneNumber || !form.password || !form.confirmPassword) {
@@ -43,10 +45,41 @@ const ReviewerSignUp: React.FC = () => {
 
     setError("");
 
-    console.log("Reviewer signup", form);
+    try {
 
-    // After successful signup
-    navigate("/reviewer/login");
+      const email = `${form.phoneNumber}@reviewer.reviewit.com`;
+
+      // Create auth account
+      const { error: authError } = await supabase.auth.signUp({
+        email,
+        password: form.password,
+      });
+
+      if (authError) {
+        setError(authError.message);
+        return;
+      }
+
+      //  Insert reviewer into users table
+      const { error: userError } = await supabase
+        .from("users")
+        .insert([
+          {
+            name: form.name,
+            phone_number: form.phoneNumber,
+          },
+        ]);
+
+      if (userError) {
+        setError(userError.message);
+        return;
+      }
+
+      navigate("/reviewer/login");
+
+    } catch (err) {
+      setError("Signup failed. Please try again.");
+    }   
   };
 
   return (

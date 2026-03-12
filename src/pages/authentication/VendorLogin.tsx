@@ -35,14 +35,14 @@ const VendorLogin: React.FC = () => {
     try {
       setLoading(true);
 
-      const email = `${phoneNumber}@vendor.reviewit`;
+       const { data, error } = await supabase
+      .from("vendors")
+      .select("*")
+      .eq("phone_number", phoneNumber)
+      .eq("password", password)
+      .single();
 
-      const { error: loginError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (loginError) {
+      if (error || !data) {
         setError("Invalid phone number or password.");
         return;
       }

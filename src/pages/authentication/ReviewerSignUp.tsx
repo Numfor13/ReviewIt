@@ -47,16 +47,18 @@ const ReviewerSignUp: React.FC = () => {
 
     try {
 
-      const email = `${form.phoneNumber}@reviewer.reviewit.com`;
+       const { error } = await supabase
+      .from("users")
+      .insert([
+        {
+          name: form.name,
+          phone_number: form.phoneNumber,
+          password: form.password,
+        },
+      ]);
 
-      // Create auth account
-      const { error: authError } = await supabase.auth.signUp({
-        email,
-        password: form.password,
-      });
-
-      if (authError) {
-        setError(authError.message);
+      if (error) {
+        setError(error.message);
         return;
       }
 

@@ -12,6 +12,8 @@ import { supabase } from "../../lib/supabaseClient";
 
 const ReviewerLogin: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
 
   const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -20,15 +22,9 @@ const ReviewerLogin: React.FC = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   
 
-  
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
-
-    const navigate = useNavigate();
-    const location = useLocation();
-    const { login } = useAuth();
 
     if (!validateCameroonPhone(phoneNumber)) {
       setError("Invalid number. Please enter a 9-digit Cameronian number.");
@@ -43,23 +39,17 @@ const ReviewerLogin: React.FC = () => {
     try {
       setLoading(true);
 
-     const email = `${phoneNumber}@reviewer.reviewit`;
+      const { data: userData, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("phone_number", phoneNumber)
+      .eq("password", password)
+      .single();
 
-      const { error: loginError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (loginError) {
+      if (error || !userData) {
         setError("Invalid phone number or password.");
         return;
       }
-
-      const { data: userData } = await supabase
-        .from("users")
-        .select("*")
-        .eq("phone_number", phoneNumber)
-        .single();
 
       login({
     
@@ -70,7 +60,7 @@ const ReviewerLogin: React.FC = () => {
   
   );
 
-      const redirectTo = location.state?.from ;
+      const redirectTo = location.state?.from || "/" ;
 
       navigate(redirectTo);
     } catch (err) {

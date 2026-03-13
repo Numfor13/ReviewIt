@@ -4,6 +4,7 @@ export interface Vendor {
   name: string;
   phoneNumber: string;
   category: string;
+  description?: string;
   averageRating: number;
   profileImage?: string;
   reviews: Review[];

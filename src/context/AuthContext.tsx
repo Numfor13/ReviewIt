@@ -3,6 +3,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 interface User {
   id: string;
   name: string;
+  phoneNumber?: string;
 }
 
 type Role = "vendor" | "reviewer";

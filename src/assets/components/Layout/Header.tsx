@@ -10,7 +10,9 @@ const Header = () => {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
   const [showMenu1, setShowMenu1] = useState(false);
-  const { user, logout } = useAuth();
+  const { user, role, logout } = useAuth();
+
+  const isVendor = role === "vendor";
 
 
   return (
@@ -27,21 +29,23 @@ const Header = () => {
 
   <div className="flex items-center space-x-2 md:space-x-4 relative">
 
-    {/* Open Chat - ALWAYS visible */}
+    {/* create business */}
+    {!isVendor && (
     <button
       onClick={() => navigate("/vendor/signup")}
       className="bg-green-800 text-white text-xs md:text-sm px-2 md:px-3 py-1.5 rounded-lg hover:bg-green-900 transition"
     >
       Create Business
     </button>
+    )}
 
-    {/* User or Sign Up - ALWAYS visible */}
+    {/* User or Sign Up */}
     {user ? (
       <div className="relative">
         <User
           className="cursor-pointer text-green-800"
           size={24}
-          onClick={() => setShowMenu(!showMenu)}
+          onClick={() => setShowMenu(prev => !prev)}
         />
 
         {showMenu && (
@@ -49,9 +53,24 @@ const Header = () => {
             <p className="px-3 py-2 text-sm font-semibold">
               {user.name}
             </p>
+            {isVendor && (
+              <button
+                onClick={() => {
+                  navigate(`/vendor/${user.phoneNumber}`);
+                  setShowMenu(false);
+                }}
+                className="block w-full text-left px-3 py-2 hover:bg-gray-100 rounded"
+              >
+                My Business
+              </button>
+            )}
 
             <button
-              onClick={() => navigate("/")}
+              onClick={() => 
+                {navigate("/")
+                setShowMenu(false)
+                }}
+              
               className="block w-full text-left px-3 py-2 hover:bg-gray-100 rounded"
             >
               Home
@@ -90,7 +109,10 @@ const Header = () => {
       {showMenu1 && (
         <div className="absolute right-0 mt-2 w-44 bg-white shadow-lg rounded-lg p-2">
           <button
-            onClick={() => navigate("/about")}
+            onClick={() => {
+              navigate("/about");
+             setShowMenu1(false);
+            }}
             className="block w-full text-left px-3 py-2 hover:bg-gray-100 rounded"
           >
              About

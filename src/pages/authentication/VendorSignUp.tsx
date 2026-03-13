@@ -9,6 +9,7 @@ import ErrorState from "../../assets/components/UI/ErrorState";
 import { validateCameroonPhone, validatePassword } from "../../utils/validators";
 import { vendorSignup } from "../../services/vendorService";
 import { categoriesLabel } from "../../utils/categories";
+import { ArrowLeft } from "lucide-react";
 
 const VendorSignUp: React.FC = () => {
   const navigate = useNavigate();
@@ -71,6 +72,14 @@ const VendorSignUp: React.FC = () => {
   };
 
   return (
+    <>
+    <button
+          onClick={() => navigate("/")}
+          className="bg-green-800 backdrop-blur-md text-white p-2 rounded-full hover:bg-green-950 transition ml-4 mt-3"
+        >
+          <ArrowLeft size={18} />
+        </button>
+   
     <div className="min-h-screen bg-linear-to-br from-green-100 via-white to-green-200 flex items-center justify-center px-4">
       <motion.div
         initial={{ opacity: 0, y: 40 }}
@@ -154,8 +163,20 @@ const VendorSignUp: React.FC = () => {
             Login
           </span>
         </p>
+
+        <p className="text-sm text-center mt-1">
+          Sign up as Reviewer?{" "}
+          <span
+            onClick={() => navigate("/reviewer/signup")}
+            className="text-green-800 font-semibold cursor-pointer hover:underline"
+          >
+            Sign Up
+          </span>
+
+        </p>
       </motion.div>
     </div>
+   </>
   );
 };
 

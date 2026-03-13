@@ -1,15 +1,18 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { validateCameroonPhone, validatePassword } from "../../utils/validators";
 import { InputAuth } from "../../assets/components/UI/Input";
 import { ButtonAuth } from "../../assets/components/UI/Button";
 import { supabase } from "../../lib/supabaseClient";
+import { useAuth } from "../../context/AuthContext";
+
 
 
 const VendorLogin: React.FC = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -47,6 +50,15 @@ const VendorLogin: React.FC = () => {
         return;
       }
 
+      login(
+        {
+          id: data.id,
+          name: data.business_name,
+          phoneNumber: data.phone_number,
+        },
+        "vendor"
+      );
+
       navigate(`/vendor/${phoneNumber}`);
     } catch (err) {
       setError("Login failed. Please try again.");
@@ -56,13 +68,23 @@ const VendorLogin: React.FC = () => {
   };
 
   return (
+    <>
+     <button
+          onClick={() => navigate("/")}
+          className="bg-green-800 backdrop-blur-md text-white p-2 rounded-full hover:bg-green-950 transition ml-4 mt-3"
+        >
+          <ArrowLeft size={18} />
+        </button>
     <div className="min-h-screen bg-linear-to-br from-green-100 via-white to-green-200 flex items-center justify-center px-4">
+
+      
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
         className="w-full max-w-sm bg-white shadow-xl rounded-2xl p-8"
       >
+
         <h2 className="text-2xl font-bold text-green-900 mb-2 text-center">
           Vendor Login
         </h2>
@@ -112,7 +134,7 @@ const VendorLogin: React.FC = () => {
           {/* Forgot Password */}
           <div className="text-right">
             <span
-              onClick={() => navigate("/reviewer/forgot-password")}
+              onClick={() => navigate("/vendor/forgot-password")}
               className="text-sm text-green-800 cursor-pointer hover:underline"
             >
               Forgot password?
@@ -137,8 +159,19 @@ const VendorLogin: React.FC = () => {
             Sign Up
           </span>
         </p>
+
+        <p className="text-sm text-center mt-1">
+          Login as Reviewer?{" "}
+          <span
+            onClick={() => navigate("/reviewer/login")}
+            className="text-green-800 font-semibold cursor-pointer hover:underline"
+          >
+            Login
+          </span>
+        </p>
       </motion.div>
     </div>
+    </>
   );
 };
 

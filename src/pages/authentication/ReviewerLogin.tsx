@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { validateCameroonPhone, validatePassword } from "../../utils/validators";
 import { InputAuth } from "../../assets/components/UI/Input";
 import { ButtonAuth } from "../../assets/components/UI/Button";
@@ -72,6 +72,14 @@ const ReviewerLogin: React.FC = () => {
   };
 
   return (
+    <>
+    <button
+          onClick={() => navigate("/")}
+          className="bg-green-800 backdrop-blur-md text-white p-2 rounded-full hover:bg-green-950 transition ml-4 mt-3"
+        >
+          <ArrowLeft size={18} />
+        </button>
+    
     <div className="min-h-screen bg-linear-to-br from-green-100 via-white to-green-200 flex items-center justify-center px-4">
       <motion.div
         initial={{ opacity: 0, y: 40 }}
@@ -150,9 +158,22 @@ const ReviewerLogin: React.FC = () => {
           >
             Sign Up
           </span>
+
+        </p>
+
+         <p className="text-sm text-center mt-1">
+          Login as vendor?{" "}
+          <span
+            onClick={() => navigate("/vendor/login")}
+            className="text-green-800 font-semibold cursor-pointer hover:underline"
+          >
+           Login
+          </span>
+
         </p>
       </motion.div>
     </div>
+    </>
   );
 };
 

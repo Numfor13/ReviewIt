@@ -312,46 +312,58 @@ const VendorProfile: React.FC = () => {
             </div>
           </div>
 
-          {/* WRITE REVIEW */}
-          <div className="flex justify-center">
+         {/* WRITE REVIEW */}
+          <div className="bg-white shadow-lg rounded-2xl p-6 border">
+
             {isReviewer && (
-              <>
-                <h3 className="font-semibold text-green-900 mb-4">Leave a Review</h3>
-                <div className="flex gap-1 mb-4 justify-center">
-                  {[1, 2, 3, 4, 5].map((star) => (
+              <div className="space-y-4">
+
+                <h3 className="font-semibold text-green-900 text-center">
+                  Leave a Review
+                </h3>
+
+                {/* Stars */}
+                <div className="flex justify-center gap-2">
+                  {[1,2,3,4,5].map((star)=>(
                     <Star
                       key={star}
                       size={26}
-                      className={`cursor-pointer ${
+                      className={`cursor-pointer transition ${
                         (hoverRating || selectedRating) >= star
                           ? "text-yellow-500 fill-yellow-500"
                           : "text-gray-300"
                       }`}
-                      onMouseEnter={() => setHoverRating(star)}
-                      onMouseLeave={() => setHoverRating(0)}
-                      onClick={() => setSelectedRating(star)}
+                      onMouseEnter={()=>setHoverRating(star)}
+                      onMouseLeave={()=>setHoverRating(0)}
+                      onClick={()=>setSelectedRating(star)}
                     />
                   ))}
                 </div>
 
+                {/* Comment */}
                 <textarea
                   placeholder="Share your experience..."
-                  className="w-full border rounded-xl p-3 text-sm resize-none focus:ring-1 focus:ring-green-400 outline-none"
+                  className="w-full border rounded-xl p-3 text-sm resize-none focus:ring-2 focus:ring-green-400 outline-none"
                   value={comment}
-                  onChange={(e) => setComment(e.target.value)}
+                  onChange={(e)=>setComment(e.target.value)}
+                  rows={4}
                 />
 
+                {/* Submit */}
                 <button
                   onClick={handleAddReview}
-                  className="w-full mt-4 bg-green-800 text-white py-2.5 rounded-xl hover:bg-green-900 transition"
+                  className="w-full bg-green-800 text-white py-2.5 rounded-xl font-medium hover:bg-green-900 transition"
                 >
                   Submit Review
                 </button>
 
                 {reviewSubmitted && (
-                  <p className="text-green-700 text-sm mt-2 text-center">Review submitted successfully!</p>
+                  <p className="text-green-700 text-sm text-center">
+                    Review submitted successfully!
+                  </p>
                 )}
-              </>
+
+              </div>
             )}
 
             {!isLoggedIn && (
@@ -366,17 +378,18 @@ const VendorProfile: React.FC = () => {
             )}
 
             {isOwnerVendor && (
-                <button
+              <button
                 onClick={()=>{
                   setEditName(vendor.name);
                   setEditCategory(vendor.category);
                   setEditOpen(true);
                 }}
-                className="mt-4 bg-green-800 text-white px-4 py-2 rounded-lg bg-center"
+                className="w-full bg-green-800 text-white py-3 rounded-xl hover:bg-green-900 transition"
               >
-                Edit Profile
+                Edit Business Profile
               </button>
             )}
+
           </div>
 
           {/* VENDOR DESCRIPTION */}
